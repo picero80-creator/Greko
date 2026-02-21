@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --orange-primary: #E8830A;
+  --orange-dark: #C96F00;
+  --orange-light: #F5A335;
+  --brown-dark: #2C1A06;
+  --brown-medium: #5C3A1E;
+  --white: #FFFFFF;
+  --off-white: #FFF8F0;
+  --gray-light: #F5F0E8;
+  --gray-text: #4A3728;
+  --black-overlay: #1A0F00;
+}
+
+body {
+  font-family: 'Lato', sans-serif;
+  padding-bottom: 80px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Oswald', sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (max-width: 768px) {
+  .testimonial-image {
+    width: 72px !important;
+    height: 72px !important;
+  }
+}
