@@ -77,7 +77,7 @@ Submitted: ${new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' })
 
     const emailRecipients = [
       "grekoroofing@gmail.com",
-      "picero80@gmail.com"
+      "Bklik81@gmail.com"
     ];
 
     const sendEmailPromises = emailRecipients.map(async (recipient) => {
