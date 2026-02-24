@@ -65,34 +65,24 @@ function App() {
     e.preventDefault();
 
     try {
-      const response = await fetch('https://api.web3forms.com/submit', {
+      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-inspection-email`;
+
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
         },
         body: JSON.stringify({
-          access_key: 'c3f8d7e2-4a6b-4c9e-8d2f-1a5e6b9c3d4e',
-          subject: `New Roof Inspection Request - ${formData.firstName}`,
-          from_name: 'Greko Roofing Website',
-          email: 'grekoroofing@gmail.com,Bklik81@gmail.com,picero80@gmail.com',
-          name: formData.firstName,
+          firstName: formData.firstName,
           phone: formData.phone,
-          message: `
-New Roof Inspection Request
-
-Name: ${formData.firstName}
-Phone: ${formData.phone}
-SMS Consent: ${formData.smsConsent ? 'Yes' : 'No'}
-Submitted At: ${new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' })}
-          `.trim(),
+          smsConsent: formData.smsConsent,
         }),
       });
 
       const result = await response.json();
 
       if (!response.ok || !result.success) {
-        throw new Error(result.message || 'Failed to submit form');
+        throw new Error(result.error || 'Failed to submit form');
       }
 
       setShowSuccessModal(true);
