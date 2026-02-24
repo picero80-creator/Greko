@@ -15,6 +15,176 @@ import {
   Clock,
 } from 'lucide-react';
 
+function SecondInspectionForm() {
+  const [formData, setFormData] = useState({
+    fullName: '',
+    phoneNumber: '',
+    smsConsent: false,
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [submitTimer, setSubmitTimer] = useState<number | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+      const response = await fetch(`${supabaseUrl}/functions/v1/send-quick-inspection`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send request');
+      }
+
+      setFormData({ fullName: '', phoneNumber: '', smsConsent: false });
+      setShowSuccess(true);
+
+      const timer = window.setTimeout(() => {
+        setShowSuccess(false);
+      }, 4000);
+      setSubmitTimer(timer);
+    } catch (error) {
+      console.error('Error:', error);
+      alert('There was an error. Please call us at (708) 668-6500 instead.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCloseSuccess = () => {
+    if (submitTimer) {
+      clearTimeout(submitTimer);
+      setSubmitTimer(null);
+    }
+    setShowSuccess(false);
+  };
+
+  const handleModalClick = () => {
+    if (submitTimer) {
+      clearTimeout(submitTimer);
+      setSubmitTimer(null);
+    }
+  };
+
+  return (
+    <>
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white/5 border border-[var(--orange-primary)]/30 rounded-xl p-6 md:p-8"
+      >
+        <div className="mb-4">
+          <label className="block text-white/85 text-sm font-bold mb-2">Full Name *</label>
+          <input
+            type="text"
+            required
+            value={formData.fullName}
+            onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+            className="w-full h-14 border-2 border-[var(--orange-primary)]/40 rounded-lg bg-white/10 text-white px-4 focus:border-[var(--orange-primary)] focus:bg-white/15 outline-none placeholder-white/45"
+            disabled={isSubmitting}
+          />
+        </div>
+
+        <div className="mb-6">
+          <label className="block text-white/85 text-sm font-bold mb-2">Phone Number *</label>
+          <input
+            type="tel"
+            required
+            value={formData.phoneNumber}
+            onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+            className="w-full h-14 border-2 border-[var(--orange-primary)]/40 rounded-lg bg-white/10 text-white px-4 focus:border-[var(--orange-primary)] focus:bg-white/15 outline-none placeholder-white/45"
+            disabled={isSubmitting}
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full h-16 bg-[var(--orange-primary)] hover:bg-[var(--orange-dark)] text-white font-bold text-lg uppercase rounded-lg shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isSubmitting ? 'SENDING...' : 'GET MY FREE INSPECTION'}
+        </button>
+
+        <p className="text-white/60 text-xs text-center mt-3 mb-4">
+          We call to schedule • No obligation
+        </p>
+
+        <div className="mb-3">
+          <label className="flex items-start gap-2 cursor-pointer justify-center">
+            <input
+              type="checkbox"
+              checked={formData.smsConsent}
+              onChange={(e) => setFormData({ ...formData, smsConsent: e.target.checked })}
+              className="mt-0.5"
+              disabled={isSubmitting}
+            />
+            <span className="text-white/50 text-xs leading-relaxed">
+              Text me inspection updates (optional). Msg rates may apply.
+            </span>
+          </label>
+        </div>
+
+        <p className="text-white/50 text-xs text-center">
+          Prefer to call?{' '}
+          <a href="tel:708-668-6500" className="text-[var(--orange-light)] hover:underline">
+            (708) 668-6500
+          </a>
+        </p>
+      </form>
+
+      {showSuccess && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center px-4"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.65)' }}
+          onClick={handleCloseSuccess}
+        >
+          <div
+            className="bg-gradient-to-br from-[#1A0F00] to-[#2C1A06] rounded-[20px] p-8 max-w-md w-full shadow-2xl relative"
+            style={{ border: '1px solid #E8830A' }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleModalClick();
+            }}
+          >
+            <button
+              onClick={handleCloseSuccess}
+              className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors"
+              aria-label="Close"
+            >
+              <X size={24} strokeWidth={2.5} />
+            </button>
+
+            <div className="text-center">
+              <div className="mb-4 flex justify-center">
+                <Check
+                  size={48}
+                  className="text-[var(--orange-primary)]"
+                  strokeWidth={3}
+                />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-4">
+                Request Received
+              </h3>
+              <p className="text-white/75 text-base leading-relaxed">
+                Thank you. Keep your phone nearby. We will call to schedule your free inspection.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 function App() {
   const [formData, setFormData] = useState({
     firstName: '',
@@ -513,6 +683,26 @@ function App() {
               </a>
             </p>
           </form>
+        </div>
+      </div>
+
+      {/* Section 7.1: SECOND FORM - New System */}
+      <div className="bg-gradient-to-br from-[#1A0F00] to-[#2C1A06] py-12 px-4">
+        <div className="max-w-lg mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-2 uppercase">
+            FREE 20-MINUTE ROOF INSPECTION
+          </h2>
+          <p className="text-white/70 text-center text-sm mb-3">
+            Check for damage, wear, and hidden issues.
+          </p>
+          <div className="flex items-center justify-center gap-1 text-[#FBBC05] mb-8">
+            {[...Array(5)].map((_, i) => (
+              <Star key={i} size={18} fill="currentColor" />
+            ))}
+            <span className="ml-2 text-white/80 text-sm">5.0 on Google</span>
+          </div>
+
+          <SecondInspectionForm />
         </div>
       </div>
 
