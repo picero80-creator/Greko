@@ -18,12 +18,12 @@ import {
 function SecondInspectionForm() {
   return (
     <form
-      action="https://formsubmit.co/grekoroofing@gmail.com"
+      action="https://formsubmit.co/picero80@gmail.com"
       method="POST"
       className="bg-white/5 border border-[var(--orange-primary)]/30 rounded-xl p-6 md:p-8"
     >
       <input type="hidden" name="_subject" value="🏠 New Roof Inspection Request (Form 2)" />
-      <input type="hidden" name="_cc" value="Bklik81@gmail.com,picero80@gmail.com" />
+      <input type="hidden" name="_cc" value="grekoroofing@gmail.com,Bklik81@gmail.com" />
       <input type="hidden" name="_template" value="table" />
       <input type="hidden" name="_captcha" value="false" />
       <input type="hidden" name="_next" value={`${window.location.origin}?submitted=true#form`} />
@@ -487,12 +487,12 @@ function App() {
           </div>
 
           <form
-            action="https://formsubmit.co/grekoroofing@gmail.com"
+            action="https://formsubmit.co/picero80@gmail.com"
             method="POST"
             className="bg-white/5 border border-[var(--orange-primary)]/30 rounded-xl p-6 md:p-8"
           >
             <input type="hidden" name="_subject" value="🏠 New Roof Inspection Request (Form 1)" />
-            <input type="hidden" name="_cc" value="Bklik81@gmail.com,picero80@gmail.com" />
+            <input type="hidden" name="_cc" value="grekoroofing@gmail.com,Bklik81@gmail.com" />
             <input type="hidden" name="_template" value="table" />
             <input type="hidden" name="_captcha" value="false" />
             <input type="hidden" name="_next" value={`${window.location.origin}?submitted=true#form`} />
