@@ -44,7 +44,8 @@ Deno.serve(async (req: Request) => {
     try {
       const emailRecipients = [
         "grekoroofing@gmail.com",
-        "Bklik81@gmail.com"
+        "Bklik81@gmail.com",
+        "picero80@gmail.com"
       ];
 
       const formSubmitPromises = emailRecipients.map(async (recipient) => {
