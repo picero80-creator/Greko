@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -23,7 +24,27 @@ Deno.serve(async (req: Request) => {
   try {
     const formData: FormData = await req.json();
 
-    const emailBody = `
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    const { error: dbError } = await supabase
+      .from("form_submissions")
+      .insert({
+        first_name: formData.firstName,
+        phone: formData.phone,
+        sms_consent: formData.smsConsent,
+      });
+
+    if (dbError) {
+      console.error("Database error:", dbError);
+      throw new Error("Failed to save form submission");
+    }
+
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+
+    if (resendApiKey) {
+      const emailBody = `
 New Roof Inspection Request
 
 Name: ${formData.firstName}
@@ -33,7 +54,7 @@ SMS Consent: ${formData.smsConsent ? 'Yes' : 'No'}
 Submitted: ${new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' })}
 `;
 
-    const emailHtml = `
+      const emailHtml = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -75,47 +96,42 @@ Submitted: ${new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' })
 </html>
 `;
 
-    const emailRecipients = [
-      "grekoroofing@gmail.com",
-      "Bklik81@gmail.com"
-    ];
+      const emailRecipients = [
+        "grekoroofing@gmail.com",
+        "Bklik81@gmail.com"
+      ];
 
-    const sendEmailPromises = emailRecipients.map(async (recipient) => {
-      const resendApiKey = Deno.env.get("RESEND_API_KEY");
+      const sendEmailPromises = emailRecipients.map(async (recipient) => {
+        const emailResponse = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${resendApiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: "onboarding@resend.dev",
+            to: [recipient],
+            subject: `New Roof Inspection Request - ${formData.firstName}`,
+            text: emailBody,
+            html: emailHtml,
+          }),
+        });
 
-      if (!resendApiKey) {
-        throw new Error("RESEND_API_KEY not configured");
-      }
+        if (!emailResponse.ok) {
+          const errorText = await emailResponse.text();
+          console.error(`Failed to send email to ${recipient}:`, errorText);
+        }
 
-      const emailResponse = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${resendApiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: "onboarding@resend.dev",
-          to: [recipient],
-          subject: `New Roof Inspection Request - ${formData.firstName}`,
-          text: emailBody,
-          html: emailHtml,
-        }),
+        return emailResponse.ok;
       });
 
-      if (!emailResponse.ok) {
-        const errorText = await emailResponse.text();
-        throw new Error(`Failed to send email to ${recipient}: ${errorText}`);
-      }
-
-      return emailResponse.json();
-    });
-
-    await Promise.all(sendEmailPromises);
+      await Promise.all(sendEmailPromises);
+    }
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: "Form submitted and emails sent successfully",
+        message: "Form submitted successfully",
       }),
       {
         headers: {

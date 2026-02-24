@@ -77,7 +77,9 @@ function App() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to submit form');
+        const errorData = await response.text();
+        console.error('Server response:', errorData);
+        throw new Error(`Failed to submit form: ${response.status} - ${errorData}`);
       }
 
       setShowSuccessModal(true);
