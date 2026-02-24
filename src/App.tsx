@@ -65,41 +65,46 @@ function App() {
     e.preventDefault();
 
     try {
-      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-form-email`;
-
-      const response = await fetch(apiUrl, {
+      const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          access_key: 'c3f8d7e2-4a6b-4c9e-8d2f-1a5e6b9c3d4e',
+          subject: `New Roof Inspection Request - ${formData.firstName}`,
+          from_name: 'Greko Roofing Website',
+          email: 'grekoroofing@gmail.com,Bklik81@gmail.com,picero80@gmail.com',
+          name: formData.firstName,
+          phone: formData.phone,
+          message: `
+New Roof Inspection Request
+
+Name: ${formData.firstName}
+Phone: ${formData.phone}
+SMS Consent: ${formData.smsConsent ? 'Yes' : 'No'}
+Submitted At: ${new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' })}
+          `.trim(),
+        }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.text();
-        console.error('Server response:', errorData);
-        throw new Error(`Failed to submit form: ${response.status} - ${errorData}`);
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || 'Failed to submit form');
       }
 
       setShowSuccessModal(true);
+      setFormData({ firstName: '', phone: '', zipCode: '', smsConsent: false });
 
-      // Set up auto-close timer for 4 seconds
       const timer = window.setTimeout(() => {
         setShowSuccessModal(false);
       }, 4000);
       setAutoCloseTimer(timer);
     } catch (error) {
       console.error('Error submitting form:', error);
-
-      let errorMessage = 'There was an error submitting your form. Please call us at (708) 668-6500 instead.';
-
-      if (error instanceof Error) {
-        console.error('Error details:', error.message);
-        errorMessage += '\n\nTechnical details: ' + error.message;
-      }
-
-      alert(errorMessage);
+      alert('There was an error submitting your form. Please call us at (708) 668-6500 instead.');
     }
   };
 
