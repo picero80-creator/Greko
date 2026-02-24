@@ -65,24 +65,27 @@ function App() {
     e.preventDefault();
 
     try {
-      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-inspection-email`;
-
-      const response = await fetch(apiUrl, {
+      const response = await fetch('https://formsubmit.co/ajax/grekoroofing@gmail.com', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify({
-          firstName: formData.firstName,
+          name: formData.firstName,
           phone: formData.phone,
-          smsConsent: formData.smsConsent,
+          smsConsent: formData.smsConsent ? 'Yes' : 'No',
+          _subject: `New Roof Inspection Request - ${formData.firstName}`,
+          _cc: 'Bklik81@gmail.com,picero80@gmail.com',
+          _template: 'table',
+          _captcha: 'false',
         }),
       });
 
       const result = await response.json();
 
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || 'Failed to submit form');
+      if (!response.ok || result.success === 'false') {
+        throw new Error('Failed to submit form');
       }
 
       setShowSuccessModal(true);
