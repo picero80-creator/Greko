@@ -41,91 +41,40 @@ Deno.serve(async (req: Request) => {
       throw new Error("Failed to save form submission");
     }
 
-    const resendApiKey = Deno.env.get("RESEND_API_KEY");
-
-    if (resendApiKey) {
-      const emailBody = `
-New Roof Inspection Request
-
-Name: ${formData.firstName}
-Phone: ${formData.phone}
-SMS Consent: ${formData.smsConsent ? 'Yes' : 'No'}
-
-Submitted: ${new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' })}
-`;
-
-      const emailHtml = `
-<!DOCTYPE html>
-<html>
-<head>
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; }
-    .header { background-color: #E8830A; color: white; padding: 20px; text-align: center; }
-    .content { background-color: white; padding: 30px; margin-top: 20px; border-radius: 5px; }
-    .field { margin-bottom: 15px; }
-    .label { font-weight: bold; color: #5A4A3A; }
-    .value { margin-left: 10px; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>New Roof Inspection Request</h1>
-    </div>
-    <div class="content">
-      <div class="field">
-        <span class="label">Name:</span>
-        <span class="value">${formData.firstName}</span>
-      </div>
-      <div class="field">
-        <span class="label">Phone:</span>
-        <span class="value">${formData.phone}</span>
-      </div>
-      <div class="field">
-        <span class="label">SMS Consent:</span>
-        <span class="value">${formData.smsConsent ? 'Yes' : 'No'}</span>
-      </div>
-      <div class="field">
-        <span class="label">Submitted:</span>
-        <span class="value">${new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' })}</span>
-      </div>
-    </div>
-  </div>
-</body>
-</html>
-`;
-
+    try {
       const emailRecipients = [
         "grekoroofing@gmail.com",
         "Bklik81@gmail.com"
       ];
 
-      const sendEmailPromises = emailRecipients.map(async (recipient) => {
-        const emailResponse = await fetch("https://api.resend.com/emails", {
+      const formSubmitPromises = emailRecipients.map(async (recipient) => {
+        const emailResponse = await fetch("https://formsubmit.co/ajax/" + recipient, {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${resendApiKey}`,
             "Content-Type": "application/json",
+            "Accept": "application/json",
           },
           body: JSON.stringify({
-            from: "onboarding@resend.dev",
-            to: [recipient],
-            subject: `New Roof Inspection Request - ${formData.firstName}`,
-            text: emailBody,
-            html: emailHtml,
+            _subject: `New Roof Inspection Request - ${formData.firstName}`,
+            Name: formData.firstName,
+            Phone: formData.phone,
+            "SMS Consent": formData.smsConsent ? 'Yes' : 'No',
+            "Submitted At": new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }),
           }),
         });
 
         if (!emailResponse.ok) {
           const errorText = await emailResponse.text();
           console.error(`Failed to send email to ${recipient}:`, errorText);
+          return false;
         }
 
-        return emailResponse.ok;
+        return true;
       });
 
-      await Promise.all(sendEmailPromises);
+      await Promise.all(formSubmitPromises);
+    } catch (emailError) {
+      console.error("Error sending emails:", emailError);
     }
 
     return new Response(
