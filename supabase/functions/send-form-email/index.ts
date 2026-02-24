@@ -94,7 +94,7 @@ Submitted: ${new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' })
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Greko Roofing <noreply@grekoroofing.com>",
+          from: "onboarding@resend.dev",
           to: [recipient],
           subject: `New Roof Inspection Request - ${formData.firstName}`,
           text: emailBody,

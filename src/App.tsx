@@ -89,7 +89,15 @@ function App() {
       setAutoCloseTimer(timer);
     } catch (error) {
       console.error('Error submitting form:', error);
-      alert('There was an error submitting your form. Please call us at (708) 668-6500 instead.');
+
+      let errorMessage = 'There was an error submitting your form. Please call us at (708) 668-6500 instead.';
+
+      if (error instanceof Error) {
+        console.error('Error details:', error.message);
+        errorMessage += '\n\nTechnical details: ' + error.message;
+      }
+
+      alert(errorMessage);
     }
   };
 
