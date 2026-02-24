@@ -30,20 +30,27 @@ function SecondInspectionForm() {
     setIsSubmitting(true);
 
     try {
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-      const response = await fetch(`${supabaseUrl}/functions/v1/send-quick-inspection`, {
+      const response = await fetch('https://formsubmit.co/ajax/grekoroofing@gmail.com', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${supabaseKey}`,
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          'Full Name': formData.fullName,
+          'Phone Number': formData.phoneNumber,
+          'SMS Consent': formData.smsConsent ? 'Yes' : 'No',
+          _subject: `🏠 New Roof Inspection Request (Form 2) - ${formData.fullName}`,
+          _cc: 'Bklik81@gmail.com,picero80@gmail.com',
+          _template: 'table',
+          _captcha: 'false',
+        }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to send request');
+      const result = await response.json();
+
+      if (!response.ok || result.success === 'false') {
+        throw new Error('Failed to submit form');
       }
 
       setFormData({ fullName: '', phoneNumber: '', smsConsent: false });
