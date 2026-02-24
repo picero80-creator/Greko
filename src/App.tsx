@@ -16,190 +16,74 @@ import {
 } from 'lucide-react';
 
 function SecondInspectionForm() {
-  const [formData, setFormData] = useState({
-    fullName: '',
-    phoneNumber: '',
-    smsConsent: false,
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [submitTimer, setSubmitTimer] = useState<number | null>(null);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      const response = await fetch('https://formsubmit.co/ajax/grekoroofing@gmail.com', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          'Full Name': formData.fullName,
-          'Phone Number': formData.phoneNumber,
-          'SMS Consent': formData.smsConsent ? 'Yes' : 'No',
-          _subject: `🏠 New Roof Inspection Request (Form 2) - ${formData.fullName}`,
-          _cc: 'Bklik81@gmail.com,picero80@gmail.com',
-          _template: 'table',
-          _captcha: 'false',
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok || result.success === 'false') {
-        throw new Error('Failed to submit form');
-      }
-
-      setFormData({ fullName: '', phoneNumber: '', smsConsent: false });
-      setShowSuccess(true);
-
-      const timer = window.setTimeout(() => {
-        setShowSuccess(false);
-      }, 4000);
-      setSubmitTimer(timer);
-    } catch (error) {
-      console.error('Error:', error);
-      alert('There was an error. Please call us at (708) 668-6500 instead.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleCloseSuccess = () => {
-    if (submitTimer) {
-      clearTimeout(submitTimer);
-      setSubmitTimer(null);
-    }
-    setShowSuccess(false);
-  };
-
-  const handleModalClick = () => {
-    if (submitTimer) {
-      clearTimeout(submitTimer);
-      setSubmitTimer(null);
-    }
-  };
-
   return (
-    <>
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white/5 border border-[var(--orange-primary)]/30 rounded-xl p-6 md:p-8"
+    <form
+      action="https://formsubmit.co/grekoroofing@gmail.com"
+      method="POST"
+      className="bg-white/5 border border-[var(--orange-primary)]/30 rounded-xl p-6 md:p-8"
+    >
+      <input type="hidden" name="_subject" value="🏠 New Roof Inspection Request (Form 2)" />
+      <input type="hidden" name="_cc" value="Bklik81@gmail.com,picero80@gmail.com" />
+      <input type="hidden" name="_template" value="table" />
+      <input type="hidden" name="_captcha" value="false" />
+      <input type="hidden" name="_next" value={`${window.location.origin}?submitted=true#form`} />
+
+      <div className="mb-4">
+        <label className="block text-white/85 text-sm font-bold mb-2">Full Name *</label>
+        <input
+          type="text"
+          name="Full Name"
+          required
+          className="w-full h-14 border-2 border-[var(--orange-primary)]/40 rounded-lg bg-white/10 text-white px-4 focus:border-[var(--orange-primary)] focus:bg-white/15 outline-none placeholder-white/45"
+        />
+      </div>
+
+      <div className="mb-6">
+        <label className="block text-white/85 text-sm font-bold mb-2">Phone Number *</label>
+        <input
+          type="tel"
+          name="Phone Number"
+          required
+          className="w-full h-14 border-2 border-[var(--orange-primary)]/40 rounded-lg bg-white/10 text-white px-4 focus:border-[var(--orange-primary)] focus:bg-white/15 outline-none placeholder-white/45"
+        />
+      </div>
+
+      <button
+        type="submit"
+        className="w-full h-16 bg-[var(--orange-primary)] hover:bg-[var(--orange-dark)] text-white font-bold text-lg uppercase rounded-lg shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-1"
       >
-        <div className="mb-4">
-          <label className="block text-white/85 text-sm font-bold mb-2">Full Name *</label>
+        GET MY FREE INSPECTION
+      </button>
+
+      <p className="text-white/60 text-xs text-center mt-3 mb-4">
+        We call to schedule • No obligation
+      </p>
+
+      <div className="mb-3">
+        <label className="flex items-start gap-2 cursor-pointer justify-center">
           <input
-            type="text"
-            required
-            value={formData.fullName}
-            onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-            className="w-full h-14 border-2 border-[var(--orange-primary)]/40 rounded-lg bg-white/10 text-white px-4 focus:border-[var(--orange-primary)] focus:bg-white/15 outline-none placeholder-white/45"
-            disabled={isSubmitting}
+            type="checkbox"
+            name="SMS Consent"
+            value="Yes"
+            className="mt-0.5"
           />
-        </div>
+          <span className="text-white/50 text-xs leading-relaxed">
+            Text me inspection updates (optional). Msg rates may apply.
+          </span>
+        </label>
+      </div>
 
-        <div className="mb-6">
-          <label className="block text-white/85 text-sm font-bold mb-2">Phone Number *</label>
-          <input
-            type="tel"
-            required
-            value={formData.phoneNumber}
-            onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-            className="w-full h-14 border-2 border-[var(--orange-primary)]/40 rounded-lg bg-white/10 text-white px-4 focus:border-[var(--orange-primary)] focus:bg-white/15 outline-none placeholder-white/45"
-            disabled={isSubmitting}
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full h-16 bg-[var(--orange-primary)] hover:bg-[var(--orange-dark)] text-white font-bold text-lg uppercase rounded-lg shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isSubmitting ? 'SENDING...' : 'GET MY FREE INSPECTION'}
-        </button>
-
-        <p className="text-white/60 text-xs text-center mt-3 mb-4">
-          We call to schedule • No obligation
-        </p>
-
-        <div className="mb-3">
-          <label className="flex items-start gap-2 cursor-pointer justify-center">
-            <input
-              type="checkbox"
-              checked={formData.smsConsent}
-              onChange={(e) => setFormData({ ...formData, smsConsent: e.target.checked })}
-              className="mt-0.5"
-              disabled={isSubmitting}
-            />
-            <span className="text-white/50 text-xs leading-relaxed">
-              Text me inspection updates (optional). Msg rates may apply.
-            </span>
-          </label>
-        </div>
-
-        <p className="text-white/50 text-xs text-center">
-          Prefer to call?{' '}
-          <a href="tel:708-668-6500" className="text-[var(--orange-light)] hover:underline">
-            (708) 668-6500
-          </a>
-        </p>
-      </form>
-
-      {showSuccess && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center px-4"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.65)' }}
-          onClick={handleCloseSuccess}
-        >
-          <div
-            className="bg-gradient-to-br from-[#1A0F00] to-[#2C1A06] rounded-[20px] p-8 max-w-md w-full shadow-2xl relative"
-            style={{ border: '1px solid #E8830A' }}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleModalClick();
-            }}
-          >
-            <button
-              onClick={handleCloseSuccess}
-              className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors"
-              aria-label="Close"
-            >
-              <X size={24} strokeWidth={2.5} />
-            </button>
-
-            <div className="text-center">
-              <div className="mb-4 flex justify-center">
-                <Check
-                  size={48}
-                  className="text-[var(--orange-primary)]"
-                  strokeWidth={3}
-                />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-4">
-                Request Received
-              </h3>
-              <p className="text-white/75 text-base leading-relaxed">
-                Thank you. Keep your phone nearby. We will call to schedule your free inspection.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+      <p className="text-white/50 text-xs text-center">
+        Prefer to call?{' '}
+        <a href="tel:708-668-6500" className="text-[var(--orange-light)] hover:underline">
+          (708) 668-6500
+        </a>
+      </p>
+    </form>
   );
 }
 
 function App() {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    phone: '',
-    zipCode: '',
-    smsConsent: false,
-  });
-
   const [showStickyBar, setShowStickyBar] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [autoCloseTimer, setAutoCloseTimer] = useState<number | null>(null);
@@ -238,45 +122,17 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    try {
-      const response = await fetch('https://formsubmit.co/ajax/grekoroofing@gmail.com', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.firstName,
-          phone: formData.phone,
-          smsConsent: formData.smsConsent ? 'Yes' : 'No',
-          _subject: `New Roof Inspection Request - ${formData.firstName}`,
-          _cc: 'Bklik81@gmail.com,picero80@gmail.com',
-          _template: 'table',
-          _captcha: 'false',
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok || result.success === 'false') {
-        throw new Error('Failed to submit form');
-      }
-
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('submitted') === 'true') {
       setShowSuccessModal(true);
-      setFormData({ firstName: '', phone: '', zipCode: '', smsConsent: false });
-
       const timer = window.setTimeout(() => {
         setShowSuccessModal(false);
+        window.history.replaceState({}, '', window.location.pathname);
       }, 4000);
       setAutoCloseTimer(timer);
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('There was an error submitting your form. Please call us at (708) 668-6500 instead.');
     }
-  };
+  }, []);
 
   const handleCloseModal = () => {
     // Clear auto-close timer if user manually closes
@@ -631,17 +487,23 @@ function App() {
           </div>
 
           <form
-            onSubmit={handleSubmit}
+            action="https://formsubmit.co/grekoroofing@gmail.com"
+            method="POST"
             className="bg-white/5 border border-[var(--orange-primary)]/30 rounded-xl p-6 md:p-8"
           >
+            <input type="hidden" name="_subject" value="🏠 New Roof Inspection Request (Form 1)" />
+            <input type="hidden" name="_cc" value="Bklik81@gmail.com,picero80@gmail.com" />
+            <input type="hidden" name="_template" value="table" />
+            <input type="hidden" name="_captcha" value="false" />
+            <input type="hidden" name="_next" value={`${window.location.origin}?submitted=true#form`} />
+
             <div className="mb-4">
               <label className="block text-white/85 text-sm font-bold mb-2">Full Name *</label>
               <input
                 type="text"
+                name="Full Name"
                 required
                 placeholder="Your full name"
-                value={formData.firstName}
-                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                 className="w-full h-14 border-2 border-[var(--orange-primary)]/40 rounded-lg bg-white/10 text-white px-4 focus:border-[var(--orange-primary)] focus:bg-white/15 outline-none placeholder-white/45"
               />
             </div>
@@ -650,10 +512,9 @@ function App() {
               <label className="block text-white/85 text-sm font-bold mb-2">Phone Number *</label>
               <input
                 type="tel"
+                name="Phone Number"
                 required
                 placeholder="Your best phone number"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 className="w-full h-14 border-2 border-[var(--orange-primary)]/40 rounded-lg bg-white/10 text-white px-4 focus:border-[var(--orange-primary)] focus:bg-white/15 outline-none placeholder-white/45"
               />
             </div>
@@ -673,8 +534,8 @@ function App() {
               <label className="flex items-start gap-2 cursor-pointer justify-center">
                 <input
                   type="checkbox"
-                  checked={formData.smsConsent}
-                  onChange={(e) => setFormData({ ...formData, smsConsent: e.target.checked })}
+                  name="SMS Consent"
+                  value="Yes"
                   className="mt-0.5"
                 />
                 <span className="text-white/50 text-xs leading-relaxed">
