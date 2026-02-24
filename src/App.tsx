@@ -15,74 +15,6 @@ import {
   Clock,
 } from 'lucide-react';
 
-function SecondInspectionForm() {
-  return (
-    <form
-      action="https://formsubmit.co/picero80@gmail.com"
-      method="POST"
-      className="bg-white/5 border border-[var(--orange-primary)]/30 rounded-xl p-6 md:p-8"
-    >
-      <input type="hidden" name="_subject" value="🏠 New Roof Inspection Request (Form 2)" />
-      <input type="hidden" name="_cc" value="grekoroofing@gmail.com,Bklik81@gmail.com" />
-      <input type="hidden" name="_template" value="table" />
-      <input type="hidden" name="_captcha" value="false" />
-      <input type="hidden" name="_next" value={`${window.location.origin}?submitted=true#form`} />
-
-      <div className="mb-4">
-        <label className="block text-white/85 text-sm font-bold mb-2">Full Name *</label>
-        <input
-          type="text"
-          name="Full Name"
-          required
-          className="w-full h-14 border-2 border-[var(--orange-primary)]/40 rounded-lg bg-white/10 text-white px-4 focus:border-[var(--orange-primary)] focus:bg-white/15 outline-none placeholder-white/45"
-        />
-      </div>
-
-      <div className="mb-6">
-        <label className="block text-white/85 text-sm font-bold mb-2">Phone Number *</label>
-        <input
-          type="tel"
-          name="Phone Number"
-          required
-          className="w-full h-14 border-2 border-[var(--orange-primary)]/40 rounded-lg bg-white/10 text-white px-4 focus:border-[var(--orange-primary)] focus:bg-white/15 outline-none placeholder-white/45"
-        />
-      </div>
-
-      <button
-        type="submit"
-        className="w-full h-16 bg-[var(--orange-primary)] hover:bg-[var(--orange-dark)] text-white font-bold text-lg uppercase rounded-lg shadow-lg shadow-orange-500/30 transition-all hover:-translate-y-1"
-      >
-        GET MY FREE INSPECTION
-      </button>
-
-      <p className="text-white/60 text-xs text-center mt-3 mb-4">
-        We call to schedule • No obligation
-      </p>
-
-      <div className="mb-3">
-        <label className="flex items-start gap-2 cursor-pointer justify-center">
-          <input
-            type="checkbox"
-            name="SMS Consent"
-            value="Yes"
-            className="mt-0.5"
-          />
-          <span className="text-white/50 text-xs leading-relaxed">
-            Text me inspection updates (optional). Msg rates may apply.
-          </span>
-        </label>
-      </div>
-
-      <p className="text-white/50 text-xs text-center">
-        Prefer to call?{' '}
-        <a href="tel:708-668-6500" className="text-[var(--orange-light)] hover:underline">
-          (708) 668-6500
-        </a>
-      </p>
-    </form>
-  );
-}
-
 function App() {
   const [showStickyBar, setShowStickyBar] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -551,26 +483,6 @@ function App() {
               </a>
             </p>
           </form>
-        </div>
-      </div>
-
-      {/* Section 7.1: SECOND FORM - New System */}
-      <div className="bg-gradient-to-br from-[#1A0F00] to-[#2C1A06] py-12 px-4">
-        <div className="max-w-lg mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-2 uppercase">
-            FREE 20-MINUTE ROOF INSPECTION
-          </h2>
-          <p className="text-white/70 text-center text-sm mb-3">
-            Check for damage, wear, and hidden issues.
-          </p>
-          <div className="flex items-center justify-center gap-1 text-[#FBBC05] mb-8">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} size={18} fill="currentColor" />
-            ))}
-            <span className="ml-2 text-white/80 text-sm">5.0 on Google</span>
-          </div>
-
-          <SecondInspectionForm />
         </div>
       </div>
 
