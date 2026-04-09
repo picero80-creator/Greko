@@ -57,6 +57,7 @@ function App() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('submitted') === 'true') {
+      if (typeof (window as any).fbq !== 'undefined') { (window as any).fbq('track', 'Lead'); }
       setShowSuccessModal(true);
       const timer = window.setTimeout(() => {
         setShowSuccessModal(false);
